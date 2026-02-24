@@ -62,8 +62,13 @@
                 { id: 't2', category: '必備票卡', task: '機場快線來回票', desc: '機場至市區最快交通' },
                 { id: 's1', category: '網路通訊', task: '電話卡 / 漫遊服務', desc: '推薦 SmarTone 或 Club Sim' },
                 { id: 'a1', category: '必裝 App', task: 'MTR Mobile', desc: '查詢地鐵路線與出口' },
+                { id: 'a2', category: '必裝 App', task: 'Uber / HKTaxi', desc: '叫計程車用' },
+                { id: 'a3', category: '必裝 App', task: 'Disney HK App', desc: '迪士尼排隊時間查詢' },
+                { id: 'a4', category: '必裝 App', task: 'Google Map', desc: '步行與巴士導航' },
                 { id: 'tk1', category: '景點門票', task: '香港迪士尼樂園門票', desc: '需提前預約入園日期' },
-                { id: 'tk2', category: '景點門票', task: '昂坪 360 纜車門票', desc: '建議買水晶車廂' }
+                { id: 'tk2', category: '景點門票', task: '昂坪 360 纜車門票', desc: '建議買水晶車廂' },
+                { id: 'tk3', category: '景點門票', task: '太平山頂纜車套票', desc: '包含凌霄閣摩天台' },
+                { id: 'tk4', category: '景點門票', task: '杜莎夫人蠟像館門票', desc: '山頂景點' }
             ];
 
             const toggleCheck = (id) => {
@@ -140,6 +145,9 @@
                             <button onClick={() => setActiveTab('checklist')} className={`flex-1 py-2 rounded-xl text-[11px] font-bold flex items-center justify-center gap-1.5 ${activeTab === 'checklist' ? 'bg-white text-blue-700 shadow-md' : 'text-white/80'}`}>
                                 <Icon name="check-circle" className="w-3 h-3" />清單
                             </button>
+                            <button onClick={() => setActiveTab('essentials')} className={`flex-1 py-2 rounded-xl text-[11px] font-bold flex items-center justify-center gap-1.5 ${activeTab === 'essentials' ? 'bg-white text-blue-700 shadow-md' : 'text-white/80'}`}>
+                                <Icon name="info" className="w-3 h-3" />指南
+                            </button>
                         </div>
 
                         <div className="grid grid-cols-2 gap-3 text-center">
@@ -209,7 +217,7 @@
                     {activeTab === 'checklist' && (
                         <div className="px-6 mt-8 animate-in pb-10">
                             <h2 className="text-2xl font-black text-gray-800 mb-6">出發前準備</h2>
-                            {['必備票卡', '網路通訊', '景點門票'].map(cat => (
+                            {['必備票卡', '網路通訊', '必裝 App', '景點門票'].map(cat => (
                                 <div key={cat} className="mb-6">
                                     <h3 className="text-[10px] font-black text-blue-600 mb-3 tracking-widest uppercase border-l-4 border-blue-600 pl-2">{cat}</h3>
                                     <div className="space-y-2">
@@ -225,6 +233,37 @@
                                     </div>
                                 </div>
                             ))}
+                        </div>
+                    )}
+
+                    {activeTab === 'essentials' && (
+                        <div className="px-6 mt-8 animate-in space-y-6 pb-10">
+                            <h2 className="text-2xl font-black text-gray-800 mb-4">行前指南</h2>
+                            <section>
+                                <h3 className="font-black text-gray-800 mb-3 flex items-center gap-2 text-sm"><Icon name="wifi" className="w-4 h-4 text-blue-600" />電話卡建議</h3>
+                                <div className="bg-white p-4 rounded-2xl shadow-sm border border-gray-100 text-[11px] space-y-3">
+                                    <p className="font-bold text-blue-800">1. SmarTone 旅客 SIM ($88)</p>
+                                    <p className="text-gray-500 leading-relaxed">機場 A11 櫃檯可買，網速穩。$88/118 港幣套餐含無限流量。</p>
+                                    <p className="font-bold text-green-800">2. Club Sim (推薦)</p>
+                                    <p className="text-gray-500 leading-relaxed">CSL 旗下，超商可買，可用於多國漫遊，適合常去旅遊的人。</p>
+                                </div>
+                            </section>
+                            <section>
+                                <h3 className="font-black text-gray-800 mb-3 flex items-center gap-2 text-sm"><Icon name="car" className="w-4 h-4 text-red-600" />計程車攻略</h3>
+                                <div className="bg-red-50 p-4 rounded-2xl border border-red-100 text-[10px] leading-relaxed text-red-900 space-y-2">
+                                    <p>● <strong>市區(紅)：</strong> 除了大嶼山南，哪都能去。你在旺角、中環就攔紅色的。</p>
+                                    <p>● <strong>機場/迪士尼(藍)：</strong> 僅限大嶼山區域。最後一天去機場可搭。</p>
+                                    <p>● <strong>注意：</strong> 許多司機仍收現金，用 Uber 叫車可綁信用卡付款免找零。</p>
+                                </div>
+                            </section>
+                            <section>
+                                <h3 className="font-black text-gray-800 mb-3 flex items-center gap-2 text-sm"><Icon name="alert-circle" className="w-4 h-4 text-orange-600" />小叮嚀</h3>
+                                <div className="bg-orange-50 p-4 rounded-2xl border border-orange-100 text-[10px] leading-relaxed text-orange-800 space-y-2">
+                                    <p>● 香港許多老店仍只收<strong>現金</strong>，建議換 1500-2000 港幣備用。</p>
+                                    <p>● 迪士尼和昂坪 360 門票請務必提前買好並預約，現場排隊會很久。</p>
+                                    <p>● 最後一天去機場前，行李可存在<strong>東薈城</strong>置物櫃。</p>
+                                </div>
+                            </section>
                         </div>
                     )}
                 </div>
