@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>香港旅遊行程助手</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- React & ReactDOM -->
+    <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+    <!-- Babel for JSX -->
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;900&display=swap');
+        body { font-family: 'Noto Sans TC', sans-serif; }
+        .animate-in { animation: fadeIn 0.3s ease-out; }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</head>
+<body class="bg-gray-50">
+    <div id="root"></div>
+
+    <script type="text/babel">
+        const { useState, useEffect } = React;
+
+        const Icon = ({ name, className }) => {
+            useEffect(() => {
+                if (window.lucide) {
+                    window.lucide.createIcons();
+                }
+            }, [name]);
+            return <i data-lucide={name} className={className}></i>;
+        };
+
+        const App = () => {
+            const [activeDay, setActiveDay] = useState(1);
+            const [activeTab, setActiveTab] = useState('itinerary'); 
+            const [expandedIndex, setExpandedIndex] = useState(null);
+            const [checkedItems, setCheckedItems] = useState(() => {
+                const saved = localStorage.getItem('hk_travel_checklist');
+                return saved ? JSON.parse(saved) : [];
+            });
+
+            useEffect(() => {
+                localStorage.setItem('hk_travel_checklist', JSON.stringify(checkedItems));
+                if (window.lucide) window.lucide.createIcons();
+            }, [checkedItems, activeTab, activeDay]);
+
+            const flightInfo = {
+                outbound: { date: '02/26 (四)', flight: 'CI9501', time: '07:50 - 09:30' },
+                inbound: { date: '02/28 (六)', flight: 'CI9366', time: '20:45 - 22:15' }
+            };
+
+            const checklistData = [
+                { id: 't1', category: '必備票卡', task: '八達通 (手機或實體卡)', desc: '搭車、吃飯必備' },
+                { id: 't2', category: '必備票卡', task: '機場快線來回票', desc: '機場至市區最快交通' },
+                { id: 's1', category: '網路通訊', task: '電話卡 / 漫遊服務', desc: '推薦 SmarTone 或 Club Sim' },
+                { id: 'a1', category: '必裝 App', task: 'MTR Mobile', desc: '查詢地鐵路線與出口' },
+                { id: 'tk1', category: '景點門票', task: '香港迪士尼樂園門票', desc: '需提前預約入園日期' },
+                { id: 'tk2', category: '景點門票', task: '昂坪 360 纜車門票', desc: '建議買水晶車廂' }
+            ];
+
+            const toggleCheck = (id) => {
+                setCheckedItems(prev => prev.includes(id) ? prev.filter(i => i !== id) : [...prev, id]);
+            };
+
+            const openMap = (locationName) => {
+                const encodedLocation = encodeURIComponent(locationName);
+                window.open(`https://www.google.com/maps/search/?api=1&query=${encodedLocation}`, '_blank');
+            };
+
+            const itinerary = [
+                {
+                    day: 1, date: '02/26 (四)', title: '中環美食、巔峰夜景與微醺 LKF',
+                    items: [
+                        { time: '09:30', title: '抵達香港國際機場', desc: '辦理入境與領取行李', transport: '接機大堂 A1', location: '香港國際機場', hours: '24 小時', icon: 'plane' },
+                        { time: '11:30', title: '旺角飯店寄放行李', desc: '建議先放行李，輕裝出發', transport: '搭乘 A21 巴士', location: '旺角', hours: '24h 櫃檯', icon: 'map-pin' },
+                        { time: '13:00', title: '午餐：九記牛腩', desc: '【指定美食】清湯牛腩，中環必排隊。', transport: '地鐵至中環站', location: '九記牛腩', hours: '12:30 - 22:30 (週日休)', icon: 'utensils' },
+                        { time: '14:30', title: '大館 & 石板街', desc: '歷史建築群與英倫感斜坡拍照。', transport: '步行', location: '大館 Tai Kwun', hours: '11:00 - 20:00', icon: 'camera' },
+                        { time: '17:00', title: '太平山纜車 & 蠟像館', desc: '捕捉夕陽與百萬夜景', transport: '步行至花園道纜車站', location: '太平山山頂纜車總站', hours: '07:30 - 23:00', icon: 'moon' },
+                        { time: '19:30', title: '晚餐：一樂燒鵝', desc: '米其林一星，近蘭桂坊。', transport: '下山後步行', location: '一樂燒鵝', hours: '10:00 - 21:00 (週日休)', icon: 'utensils' },
+                        { time: '21:00', title: '微醺時刻：蘭桂坊', desc: '香港夜生活重心，喝一杯', transport: '步行', location: '蘭桂坊', hours: '傍晚至深夜', icon: 'glass-water' },
+                        { time: '22:30', title: '宵夜：佳佳甜品', desc: '米其林甜湯暖胃。', transport: '地鐵回佐敦/旺角', location: '佳佳甜品', hours: '12:00 - 03:30', icon: 'utensils' }
+                    ]
+                },
+                {
+                    day: 2, date: '02/27 (五)', title: '香港迪士尼：夢幻之旅',
+                    items: [
+                        { time: '09:00', title: '早餐：金華冰廳', desc: '【指定美食】得獎菠蘿油。就在旺角。', transport: '步行', location: '金華冰廳', hours: '06:30 - 23:30', icon: 'utensils' },
+                        { time: '11:00', title: '香港迪士尼樂園', desc: '全天入園，玩到煙火結束', transport: '地鐵荃灣線 -> 欣澳轉車', location: '香港迪士尼樂園', hours: '10:00 - 21:00', icon: 'star' },
+                        { time: '20:30', title: '星夢光影之旅', desc: '夢幻城堡煙火秀', transport: '城堡前廣場', location: '香港迪士尼樂園城堡', hours: '視當日公告', icon: 'sparkles' },
+                        { time: '22:00', title: '回旺角休息', desc: '飯店周邊宵夜與購物', transport: '地鐵折返', location: '旺角', hours: '越夜越熱鬧', icon: 'moon' }
+                    ]
+                },
+                {
+                    day: 3, date: '02/28 (六)', title: '大嶼山自然與購物之旅',
+                    items: [
+                        { time: '08:30', title: '早餐：澳洲牛奶公司', desc: '【推薦美食】傳奇炒蛋多士與燉奶，翻桌速度快。', transport: '地鐵至佐敦站', location: '澳洲牛奶公司', hours: '07:30 - 22:00 (週四休)', icon: 'utensils' },
+                        { time: '10:30', title: '寄放行李至東涌站', desc: '行李寄放東薈城 S1 樓置物櫃', transport: '地鐵至東涌站', location: '東涌站', hours: '24h', icon: 'info' },
+                        { time: '11:00', title: '昂坪 360 纜車', desc: '水晶車廂看海景', transport: '東涌站旁', location: '昂坪360東涌纜車站', hours: '10:00 - 18:00', icon: 'map' },
+                        { time: '12:00', title: '天壇大佛 & 昂坪市集', desc: '參拜大佛，吃市集豆腐花。', transport: '步行', location: '天壇大佛', hours: '10:00 - 17:30', icon: 'map-pin' },
+                        { time: '13:30', title: '大澳漁村 (延伸建議)', desc: '【推薦景點】搭乘 21 號巴士或渡輪，看棚屋與吃沙翁。', transport: '從昂坪搭巴士約 20 分鐘', location: '大澳漁村', hours: '全天', icon: 'camera' },
+                        { time: '16:00', title: '東薈城 Outlet 購物', desc: '最後採買與晚餐，名牌折扣多。', transport: '搭巴士回東涌站', location: '東薈城名店倉', hours: '10:00 - 22:00', icon: 'shopping-bag' },
+                        { time: '18:00', title: '晚餐：添好運', desc: '【推薦美食】全世界最便宜米其林，東薈城內分店。', transport: '東薈城內', location: '添好運 東涌店', hours: '10:00 - 21:00', icon: 'utensils' },
+                        { time: '19:00', title: '前往機場', desc: '準備登機 (20:45 班機)', transport: 'S1 巴士 (15分鐘)', location: '香港國際機場', hours: '24 小時', icon: 'plane' }
+                    ]
+                }
+            ];
+
+            const progressPercent = Math.round((checkedItems.length / checklistData.length) * 100);
+
+            return (
+                <div className="max-w-md mx-auto min-h-screen bg-gray-50 pb-20 overflow-x-hidden">
+                    {/* Header */}
+                    <div className="bg-gradient-to-r from-blue-600 to-indigo-800 text-white p-6 rounded-b-[40px] shadow-xl">
+                        <div className="flex justify-between items-center mb-6">
+                            <div>
+                                <h1 className="text-2xl font-black italic">HK GO!</h1>
+                                <p className="text-blue-100 text-[10px] tracking-widest uppercase">2/26 - 2/28 | 旺角住宿</p>
+                            </div>
+                            <div className="text-right">
+                                <div className="text-[10px] font-bold text-blue-200 mb-1">準備 {progressPercent}%</div>
+                                <div className="w-20 h-1.5 bg-white/20 rounded-full overflow-hidden">
+                                    <div className="h-full bg-green-400" style={{ width: `${progressPercent}%` }}></div>
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* Nav Tabs */}
+                        <div className="flex bg-white/10 p-1 rounded-2xl mb-4 backdrop-blur-sm">
+                            <button onClick={() => setActiveTab('itinerary')} className={`flex-1 py-2 rounded-xl text-[11px] font-bold flex items-center justify-center gap-1.5 ${activeTab === 'itinerary' ? 'bg-white text-blue-700 shadow-md' : 'text-white/80'}`}>
+                                <Icon name="calendar" className="w-3 h-3" />行程
+                            </button>
+                            <button onClick={() => setActiveTab('checklist')} className={`flex-1 py-2 rounded-xl text-[11px] font-bold flex items-center justify-center gap-1.5 ${activeTab === 'checklist' ? 'bg-white text-blue-700 shadow-md' : 'text-white/80'}`}>
+                                <Icon name="check-circle" className="w-3 h-3" />清單
+                            </button>
+                        </div>
+
+                        <div className="grid grid-cols-2 gap-3 text-center">
+                            <div className="bg-white/10 p-2 rounded-xl border border-white/10">
+                                <div className="text-[8px] opacity-70">去程 CI9501</div>
+                                <div className="font-bold text-xs">{flightInfo.outbound.time}</div>
+                            </div>
+                            <div className="bg-white/10 p-2 rounded-xl border border-white/10">
+                                <div className="text-[8px] opacity-70">回程 CI9366</div>
+                                <div className="font-bold text-xs">{flightInfo.inbound.time}</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    {activeTab === 'itinerary' && (
+                        <div className="animate-in">
+                            <div className="flex px-4 -mt-4 gap-3">
+                                {[1, 2, 3].map(d => (
+                                    <button key={d} onClick={() => {setActiveDay(d); setExpandedIndex(null);}} className={`flex-1 py-3 rounded-2xl text-sm font-bold shadow-sm transition-all ${activeDay === d ? 'bg-blue-600 text-white scale-105' : 'bg-white text-gray-500'}`}>
+                                        Day {d}
+                                    </button>
+                                ))}
+                            </div>
+
+                            <div className="px-6 mt-8">
+                                <h2 className="text-xl font-black text-gray-800 mb-1">{itinerary[activeDay-1].title}</h2>
+                                <p className="text-xs text-gray-400 mb-6">{itinerary[activeDay-1].date}</p>
+
+                                <div className="space-y-4">
+                                    {itinerary[activeDay-1].items.map((item, idx) => (
+                                        <div key={idx} className="relative pl-8 border-l-2 border-dashed border-gray-200 pb-2" onClick={() => setExpandedIndex(expandedIndex === idx ? null : idx)}>
+                                            <div className={`absolute -left-[13px] top-0 w-6 h-6 rounded-full flex items-center justify-center border-4 border-gray-50 ${expandedIndex === idx ? 'bg-blue-600 text-white shadow-md' : 'bg-blue-100 text-blue-600'}`}>
+                                                <Icon name={item.icon} className="w-3 h-3" />
+                                            </div>
+                                            <div className={`p-4 rounded-2xl transition-all ${expandedIndex === idx ? 'bg-white shadow-lg ring-1 ring-blue-50' : 'bg-white/60 shadow-sm'}`}>
+                                                <div className="flex justify-between items-center">
+                                                    <div>
+                                                        <span className="text-[10px] font-black text-blue-500 tracking-wider">{item.time}</span>
+                                                        <h3 className="font-bold text-gray-800 text-sm">{item.title}</h3>
+                                                    </div>
+                                                    <Icon name="chevron-right" className={`w-4 h-4 text-gray-300 transition-transform ${expandedIndex === idx ? 'rotate-90' : ''}`} />
+                                                </div>
+                                                {expandedIndex === idx && (
+                                                    <div className="mt-3 pt-3 border-t border-gray-100 animate-in">
+                                                        <p className="text-xs text-gray-600 mb-3 leading-relaxed">{item.desc}</p>
+                                                        <div className="space-y-2">
+                                                            <div className="flex items-center gap-2 text-[10px] font-bold text-orange-700 bg-orange-50 p-2 rounded-xl">
+                                                                <Icon name="clock" className="w-3 h-3" /> 營業：{item.hours}
+                                                            </div>
+                                                            <div className="flex items-center gap-2 text-[10px] font-bold text-blue-700 bg-blue-50 p-2 rounded-xl">
+                                                                <Icon name="navigation" className="w-3 h-3" /> {item.transport}
+                                                            </div>
+                                                            <button onClick={(e) => {e.stopPropagation(); openMap(item.location);}} className="w-full bg-green-600 text-white py-2.5 rounded-xl text-[10px] font-bold flex items-center justify-center gap-2 shadow-sm hover:bg-green-700">
+                                                                <Icon name="map" className="w-3 h-3" />開啟地圖帶路
+                                                            </button>
+                                                        </div>
+                                                    </div>
+                                                )}
+                                            </div>
+                                        </div>
+                                    ))}
+                                </div>
+                            </div>
+                        </div>
+                    )}
+
+                    {activeTab === 'checklist' && (
+                        <div className="px-6 mt-8 animate-in pb-10">
+                            <h2 className="text-2xl font-black text-gray-800 mb-6">出發前準備</h2>
+                            {['必備票卡', '網路通訊', '景點門票'].map(cat => (
+                                <div key={cat} className="mb-6">
+                                    <h3 className="text-[10px] font-black text-blue-600 mb-3 tracking-widest uppercase border-l-4 border-blue-600 pl-2">{cat}</h3>
+                                    <div className="space-y-2">
+                                        {checklistData.filter(i => i.category === cat).map(item => (
+                                            <div key={item.id} onClick={() => toggleCheck(item.id)} className={`flex items-center gap-3 p-4 rounded-2xl border transition-all ${checkedItems.includes(item.id) ? 'bg-green-50 border-green-100 opacity-60' : 'bg-white border-gray-100 shadow-sm'}`}>
+                                                <Icon name={checkedItems.includes(item.id) ? "check-circle" : "circle"} className={`w-5 h-5 ${checkedItems.includes(item.id) ? 'text-green-500' : 'text-gray-200'}`} />
+                                                <div className="flex-1">
+                                                    <div className={`text-sm font-bold ${checkedItems.includes(item.id) ? 'line-through text-gray-400' : 'text-gray-800'}`}>{item.task}</div>
+                                                    <div className="text-[10px] text-gray-400">{item.desc}</div>
+                                                </div>
+                                            </div>
+                                        ))}
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+                    )}
+                </div>
+            );
+        };
+
+        const root = ReactDOM.createRoot(document.getElementById('root'));
+        root.render(<App />);
+    </script>
+</body>
+</html>
